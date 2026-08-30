@@ -1,3 +1,5 @@
+"use client";
+
 import { X, Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useEffect, useState } from 'react';
