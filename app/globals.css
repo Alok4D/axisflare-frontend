@@ -1,0 +1,287 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* --- 1. DARK MODE VARIANT --- */
+@custom-variant dark (&:is(.dark *));
+
+/* --- 2. TAILWIND THEME CONFIGURATION --- */
+@theme inline {
+  /* Font Family*/
+  --font-inter: var(--font-inter);
+  --font-sans: var(--font-inter);
+
+  /* Font Sizes */
+  /* 1rem = 16px */
+  /* 1.5rem = 24px */
+  /* 2.5rem = 40px */
+
+  --font-size-display: 2.5rem;
+  --font-size-h2: 1.75rem;
+  --font-size-h1: 1.5rem;
+  --font-size-14: 14px;
+  --font-size-body: 1rem;
+  --font-size-tiny: 0.6875rem;
+
+  /* Custom Colors */
+  --color-text-strong: var(--text-strong);
+  --color-text-strong-white: var(--text-strong-white);
+  --color-text-strong-black: var(--color-text-strong-black);
+  --color-text-weak: var(--text-weak);
+  --color-brand-primary: var(--brand-primary);
+  --color-dashboard-bg: var(--dashboard-bg);
+  --color-prj-gray: var(--prj-gray);
+  --color-system-red: var(--system-red);
+  --color-warning-text: var(--warning-text);
+  --color-success-text: var(--success-text);
+
+  /* Shadcn Core Colors Mapping */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-muted: var(--brand-muted);
+}
+
+/* --- 3. GLOBAL VARIABLES (LIGHT MODE) --- */
+:root {
+  /* scroll-behavior: smooth; -- Removed again as it conflicts with premium JS animations */
+  /* Shadcn & System Defaults */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --radius: 0.625rem;
+  --primary: oklch(0.45 0.18 250.31);
+  --brand-muted: oklch(0.96 0.01 250.31);
+
+  /* --- CUSTOM COLORS FROM FIGMA --- */
+
+  /* Text Colors */
+  --text-strong: oklch(0.13 0 0);
+  /* #121212 - Strong Black */
+  --text-strong-white: #F5F5F5;
+  --text-strong-black: #121212;
+  --text-weak: oklch(0.42 0 0);
+  /* #595959 - Weak Gray */
+
+  /* Brand Colors */
+  --brand-primary: oklch(0.52 0.12 237.5);
+  /* #0071BD - Primary Blue */
+
+  /* Dashboard Colors */
+  --dashboard-bg: oklch(1 0 0);
+  /* #FFFFFF - White */
+
+  /* Project/Utility Colors */
+  --prj-gray: oklch(0.59 0 0);
+  /* #878787 - Project Gray */
+
+  /* System/Status Colors */
+  --system-red: oklch(0.52 0.20 27.33);
+  /* #D32F2F - Error/Alert Red */
+  --warning-text: oklch(0.53 0.11 75.83);
+  /* #8F6C1A - Warning Brown/Yellow */
+  --success-text: oklch(0.46 0.11 171.36);
+  /* #067A57 - Success Green */
+}
+
+/* --- 4. DARK MODE SETTINGS --- */
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --brand-muted: oklch(0.25 0.02 250.31);
+
+  /* Dark Mode Custom Colors */
+  --text-strong: oklch(0.95 0 0);
+  --text-weak: oklch(0.65 0 0);
+  --dashboard-bg: oklch(0.145 0 0);
+}
+
+/* --- 5. BASE STYLES --- */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
+  }
+}
+
+/* --- 6. CUSTOM UTILITIES --- */
+@layer utilities {
+
+  /* Font Sizes */
+  .text-display {
+    font-size: var(--font-size-display);
+  }
+
+  .text-h1 {
+    font-size: var(--font-size-h1);
+  }
+
+  .text-14 {
+    font-size: var(--font-size-14);
+  }
+
+  .text-body {
+    font-size: var(--font-size-body);
+  }
+
+  .text-tiny {
+    font-size: var(--font-size-tiny);
+  }
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+
+
+/* AxisFlare Shine Animation
+   — Sharp, professional glass-streak effect
+   — Direction: right → left, 45° diagonal
+   — Pattern: shine → long pause → shine (not a constant loop) */
+
+
+/* ─── Travel text shine (Footer) ───────────────────────────────
+   The streak is very narrow (44% → 50% → 56%) — only 12% wide.
+   It spends 70% of the animation timeline sitting off-screen (paused).
+   Total cycle: 6s — shine takes ~1.8s, pause ~4.2s               */
+@keyframes travelShine {
+  0% {
+    background-position: 160% center;
+  }
+
+  /* start: streak off-screen right */
+  30% {
+    background-position: -60% center;
+  }
+
+  /* end:   streak exits left */
+  100% {
+    background-position: -60% center;
+  }
+
+  /* hold off-screen → feels like pause */
+}
+
+
+/* ─── Footer "Travel" big text ─────────────────────────────── */
+.travel-text {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(80px, 25.5vw, 440px);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  line-height: 0.7;
+  text-transform: none;
+  white-space: nowrap;
+  display: block;
+  text-align: center;
+  width: 100%;
+  transform: translateY(24%);
+
+  /* Base: dim white — the sharp streak sits at center 6% wide */
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.15) 44%,
+      rgba(255, 255, 255, 0.55) 47%,
+      /* leading soft edge  */
+      rgba(255, 255, 255, 0.90) 50%,
+      /* bright center      */
+      rgba(255, 255, 255, 0.55) 53%,
+      /* trailing soft edge */
+      rgba(255, 255, 255, 0.15) 56%,
+      rgba(255, 255, 255, 0.15) 100%);
+  background-size: 300% 100%;
+  background-position: 160% center;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: travelShine 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 0.9s;
+}
+
+
+/* ─── Hero Heading shutter reveal (repeating) ───────────────── */
+@keyframes shutterReveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  /* hidden: right wall closed  */
+  40% {
+    clip-path: inset(0 0% 0 0);
+  }
+
+  /* fully visible              */
+  70% {
+    clip-path: inset(0 0% 0 0);
+  }
+
+  /* hold visible               */
+  100% {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  /* back to hidden             */
+}
+
+.shutter-1 {
+  display: inline-block;
+  animation: shutterReveal 4s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+  animation-delay: 0.3s;
+}
+
+.shutter-2 {
+  display: block;
+  animation: shutterReveal 4s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+  animation-delay: 0.55s;
+}
+
+/* ─── Hero Heading base gradient ────────────────────────────── */
+.hero-heading {
+  background: linear-gradient(90deg, #202020 0%, #77AEE1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
