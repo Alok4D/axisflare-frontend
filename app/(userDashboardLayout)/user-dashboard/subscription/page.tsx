@@ -209,7 +209,7 @@ const UserAvailableSubscription = () => {
                                 <AlertDialogTrigger asChild>
                                     <button 
                                         disabled={isCancelling}
-                                        className="px-6 py-2.5 rounded-xl border border-red-200 text-red-500 font-semibold text-xs hover:bg-red-50 hover:border-red-300 transition-all active:scale-[0.98] disabled:opacity-50 whitespace-nowrap flex items-center gap-2 shadow-sm bg-white"
+                                        className="px-6 py-2.5 rounded-md border border-red-200 text-red-500 font-medium text-xs hover:bg-red-50 hover:border-red-300 transition-all active:scale-[0.98] disabled:opacity-50 whitespace-nowrap flex items-center gap-2 bg-white"
                                     >
                                         {isCancelling && <Loader className="w-3 h-3 animate-spin" />}
                                         {isCancelling ? "Cancelling..." : "Cancel Plan"}
