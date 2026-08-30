@@ -23,42 +23,42 @@ const statusConfig: any = {
     "ACTIVE": {
         label: "Active Plan",
         icon: ShieldCheck,
-        color: "bg-green-500",
-        light: "bg-green-50",
-        border: "border-green-100",
-        text: "text-green-700",
-        bgIcon: "bg-green-100",
-        iconColor: "text-green-600"
+        color: "bg-green-50 text-green-600 border-green-200/50",
+        light: "bg-white",
+        border: "border-slate-100",
+        text: "text-slate-700",
+        bgIcon: "bg-green-50/50",
+        iconColor: "text-green-500"
     },
     "INACTIVE": {
         label: "No Active Plan",
         icon: AlertCircle,
-        color: "bg-slate-400",
-        light: "bg-slate-50",
+        color: "bg-slate-50 text-slate-500 border-slate-200/50",
+        light: "bg-white",
         border: "border-slate-100",
-        text: "text-slate-600",
-        bgIcon: "bg-slate-100",
-        iconColor: "text-slate-500"
+        text: "text-slate-500",
+        bgIcon: "bg-slate-50",
+        iconColor: "text-slate-400"
     },
     "EXPIRED": {
         label: "Plan Expired",
         icon: Clock,
-        color: "bg-amber-500",
-        light: "bg-amber-50",
-        border: "border-amber-100",
-        text: "text-amber-700",
-        bgIcon: "bg-amber-100",
-        iconColor: "text-amber-600"
+        color: "bg-amber-50 text-amber-600 border-amber-200/50",
+        light: "bg-white",
+        border: "border-slate-100",
+        text: "text-slate-700",
+        bgIcon: "bg-amber-50/50",
+        iconColor: "text-amber-500"
     },
     "CANCELLED": {
         label: "Plan Cancelled",
         icon: XCircle,
-        color: "bg-red-500",
-        light: "bg-red-50",
-        border: "border-red-100",
-        text: "text-red-700",
-        bgIcon: "bg-red-100",
-        iconColor: "text-red-600"
+        color: "bg-red-50 text-red-600 border-red-200/50",
+        light: "bg-white",
+        border: "border-slate-100",
+        text: "text-slate-700",
+        bgIcon: "bg-red-50/50",
+        iconColor: "text-red-500"
     }
 };
 
@@ -151,21 +151,21 @@ const UserAvailableSubscription = () => {
             <motion.section 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={cn("p-8 rounded-4xl border relative overflow-hidden group transition-all", config.light, config.border)}
+                className={cn("p-6 rounded-2xl border bg-white shadow-[0_8px_30px_rgba(119,174,225,0.05)] relative overflow-hidden group transition-all", config.border)}
             >
                 {/* Decorative blobs */}
-                <div className={cn("absolute -top-24 -right-24 w-64 h-64 opacity-20 rounded-full blur-3xl", config.color)} />
+                <div className={cn("absolute -top-24 -right-24 w-64 h-64 opacity-5 rounded-full blur-3xl", config.bgIcon)} />
                 
                 <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div className="flex items-center gap-6">
-                        <div className={cn("w-20 h-20 rounded-3xl flex items-center justify-center shadow-sm", config.bgIcon)}>
-                            <StatusIcon className={cn("w-10 h-10", config.iconColor)} />
+                        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm border border-slate-100/50", config.bgIcon)}>
+                            <StatusIcon className={cn("w-7 h-7", config.iconColor)} />
                         </div>
                         <div className="space-y-1.5">
-                            <span className={cn("inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest", config.color, "text-white")}>
+                            <span className={cn("inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border", config.color)}>
                                 {config.label}
                             </span>
-                            <h2 className="text-2xl font-bold text-slate-800">
+                            <h2 className="text-xl font-bold text-slate-800">
                                 {currentStatus === "ACTIVE" 
                                     ? planDetails?.name || "Premium Plan"
                                     : "No Active Subscription"}
@@ -173,19 +173,19 @@ const UserAvailableSubscription = () => {
                             {currentStatus === "ACTIVE" && (
                                 <div className="space-y-1">
                                     {mySubData?.data?.subscriptionStartDate && (
-                                        <p className="text-slate-500 text-sm">
+                                        <p className="text-slate-500 text-xs">
                                             Active From: <span className="font-bold text-slate-700">{new Date(mySubData.data.subscriptionStartDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                                         </p>
                                     )}
                                     {mySubData?.data?.subscriptionEndDate && (
-                                        <p className="text-slate-500 text-sm">
+                                        <p className="text-slate-500 text-xs">
                                             Expires On: <span className="font-bold text-slate-700">{new Date(mySubData.data.subscriptionEndDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                                         </p>
                                     )}
                                     {timeLeft && (
-                                        <div className="flex items-center gap-2 mt-2 py-1.5 px-3 bg-white/60 backdrop-blur-sm border border-slate-200/50 rounded-xl w-fit shadow-sm">
+                                        <div className="flex items-center gap-2 mt-2 py-1 px-2.5 bg-slate-50 border border-slate-100 rounded-lg w-fit">
                                             <Clock className="w-3.5 h-3.5 text-[#77AEE1] animate-pulse" />
-                                            <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+                                            <p className="text-[10px] font-bold text-slate-700 uppercase tracking-tight">
                                                 Time Remaining: 
                                                 <span className="ml-1 text-[#77AEE1]">
                                                     {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
@@ -195,7 +195,7 @@ const UserAvailableSubscription = () => {
                                     )}
                                 </div>
                             )}
-                            <p className="text-slate-500 text-sm mt-1">
+                            <p className="text-slate-500 text-xs mt-1">
                                 {currentStatus === "ACTIVE" 
                                     ? "Enjoy unlimited AI reports and early access to new transit updates." 
                                     : "Unlock full route analysis, transit rules, and premium AI insights."}
@@ -209,7 +209,7 @@ const UserAvailableSubscription = () => {
                                 <AlertDialogTrigger asChild>
                                     <button 
                                         disabled={isCancelling}
-                                        className="px-8 py-3 rounded-md bg-white border border-red-500 text-red-500 font-bold text-md hover:bg-red-50 transition-all active:scale-95 disabled:opacity-50 text-[14px] whitespace-nowrap flex items-center gap-2"
+                                        className="px-6 py-2.5 rounded-xl border border-red-200 text-red-500 font-semibold text-xs hover:bg-red-50 hover:border-red-300 transition-all active:scale-[0.98] disabled:opacity-50 whitespace-nowrap flex items-center gap-2 shadow-sm bg-white"
                                     >
                                         {isCancelling && <Loader className="w-3 h-3 animate-spin" />}
                                         {isCancelling ? "Cancelling..." : "Cancel Plan"}
