@@ -23,42 +23,42 @@ const statusConfig: any = {
     "ACTIVE": {
         label: "Active Plan",
         icon: ShieldCheck,
-        color: "bg-green-50 text-green-600 border-green-200/50",
-        light: "bg-white",
-        border: "border-slate-100",
+        color: "bg-green-500/10 text-green-600 border-green-200/50",
+        light: "bg-green-50/40",
+        border: "border-green-100",
         text: "text-slate-700",
-        bgIcon: "bg-green-50/50",
-        iconColor: "text-green-500"
+        bgIcon: "bg-green-100/50",
+        iconColor: "text-green-600"
     },
     "INACTIVE": {
         label: "No Active Plan",
         icon: AlertCircle,
-        color: "bg-slate-50 text-slate-500 border-slate-200/50",
-        light: "bg-white",
-        border: "border-slate-100",
+        color: "bg-slate-500/10 text-slate-500 border-slate-200/50",
+        light: "bg-slate-50/40",
+        border: "border-slate-150",
         text: "text-slate-500",
-        bgIcon: "bg-slate-50",
-        iconColor: "text-slate-400"
+        bgIcon: "bg-slate-100/50",
+        iconColor: "text-slate-500"
     },
     "EXPIRED": {
         label: "Plan Expired",
         icon: Clock,
-        color: "bg-amber-50 text-amber-600 border-amber-200/50",
-        light: "bg-white",
-        border: "border-slate-100",
+        color: "bg-amber-500/10 text-amber-600 border-amber-200/50",
+        light: "bg-amber-50/40",
+        border: "border-amber-100",
         text: "text-slate-700",
-        bgIcon: "bg-amber-50/50",
-        iconColor: "text-amber-500"
+        bgIcon: "bg-amber-100/50",
+        iconColor: "text-amber-600"
     },
     "CANCELLED": {
         label: "Plan Cancelled",
         icon: XCircle,
-        color: "bg-red-50 text-red-600 border-red-200/50",
-        light: "bg-white",
-        border: "border-slate-100",
+        color: "bg-red-500/10 text-red-600 border-red-200/50",
+        light: "bg-red-50/40",
+        border: "border-red-100",
         text: "text-slate-700",
-        bgIcon: "bg-red-50/50",
-        iconColor: "text-red-500"
+        bgIcon: "bg-red-100/50",
+        iconColor: "text-red-600"
     }
 };
 
@@ -151,10 +151,10 @@ const UserAvailableSubscription = () => {
             <motion.section 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={cn("p-6 rounded-2xl border bg-white shadow-[0_8px_30px_rgba(119,174,225,0.05)] relative overflow-hidden group transition-all", config.border)}
+                className={cn("p-6 rounded-2xl border relative overflow-hidden group transition-all shadow-[0_4px_20px_-4px_rgba(119,174,225,0.08)]", config.light, config.border)}
             >
                 {/* Decorative blobs */}
-                <div className={cn("absolute -top-24 -right-24 w-64 h-64 opacity-5 rounded-full blur-3xl", config.bgIcon)} />
+                <div className={cn("absolute -top-24 -right-24 w-64 h-64 opacity-10 rounded-full blur-3xl", config.bgIcon)} />
                 
                 <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div className="flex items-center gap-6">
