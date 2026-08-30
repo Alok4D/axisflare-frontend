@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { Check, ShieldCheck, Clock, XCircle, AlertCircle, Sparkles, PlaneIcon, Loader2, Loader } from "lucide-react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useGetMeQuery } from "@/lib/features/user/userApi";
 import { useGetSubscriptionPlansQuery, useCreateCheckoutSessionMutation, useGetMySubscriptionQuery, useCancelSubscriptionMutation } from "@/lib/features/subscription/subscriptionApi";
 import { toast } from "sonner";
@@ -247,7 +247,7 @@ const UserAvailableSubscription = () => {
                     <h3 className="text-xl font-bold text-slate-800">Available Plans</h3>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="flex flex-wrap gap-8 justify-start">
                     {plansData?.data?.map((plan: any, idx: number) => {
                         const isCurrent = planDetails?.id === plan.id;
                         return (
@@ -271,69 +271,153 @@ function PlanCard({ plan, idx, onSubscribe, isLoading, isCurrent }: any) {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
 
+    const rawY = useMotionValue(0);
+    const rawShadow = useMotionValue(0);
+
+    const y = useSpring(rawY, { stiffness: 120, damping: 18, mass: 0.6 });
+    const shadowBlur = useSpring(rawShadow, { stiffness: 120, damping: 18, mass: 0.6 });
+    const boxShadow = useTransform(
+        shadowBlur,
+        [0, 1],
+        [
+            "0 4px 12px -2px rgba(119,174,225,0.08)",
+            "0 24px 40px -8px rgba(119,174,225,0.22)",
+        ]
+    );
+
+    const subtext = plan.billingPeriod === "MONTHLY" ? "/monthly" : plan.billingPeriod === "WEEKLY" ? "/weekly" : "";
+
+    const cardVariants = {
+        hidden: { opacity: 0, y: 40, scale: 0.96 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+        },
+    };
+
+    const featureVariants = {
+        hidden: { opacity: 0, x: -16 },
+        visible: (i: number) => ({
+            opacity: 1,
+            x: 0,
+            transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const, delay: i * 0.07 },
+        }),
+    };
+
     return (
         <motion.div
             ref={ref}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ delay: idx * 0.1 }}
-            className={cn(
-                "p-8 rounded-4xl bg-white border border-slate-100 shadow-[0_20px_40px_-15px_rgba(119,174,225,0.15)] flex flex-col justify-between transition-all hover:translate-y-[-4px]",
-                plan.billingPeriod === "WEEKLY" ? "border-[#FF6B6B]/20" : "border-[#77AEE1]/20"
-            )}
+            variants={cardVariants}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            style={{ y, boxShadow }}
+            onMouseEnter={() => { rawY.set(-7); rawShadow.set(1); }}
+            onMouseLeave={() => { rawY.set(0); rawShadow.set(0); }}
+            className="flex flex-col justify-between w-84.75 h-130 bg-white border border-blue-50 rounded-2xl overflow-hidden cursor-pointer"
         >
-            <div>
-                <div className="flex justify-between items-start mb-6">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                             <h4 className="text-xl font-extrabold text-slate-800">{plan.name}</h4>
-                             {plan.billingPeriod === "YEARLY" && (
-                                <span className="bg-amber-100 text-amber-700 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase">Most Popular</span>
-                             )}
-                        </div>
-                        <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">{plan.billingPeriod} ACCESS</p>
+            <div className="flex flex-col">
+                {/* Blue Header Section */}
+                <div className="bg-[#77AEE1] p-6 text-white h-30 flex flex-col justify-center">
+                    <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-[17px] font-medium">{plan.name}</h3>
+                        {plan.billingPeriod === "YEARLY" && (
+                            <span className="bg-amber-400 text-white px-2 py-0.5 rounded-full text-[9px] font-black uppercase">Popular</span>
+                        )}
                     </div>
-                    <div className="text-right">
-                        <span className="text-3xl font-black text-slate-900">${plan.price}</span>
-                        <p className="text-slate-400 text-[10px] font-bold">Excl. taxes</p>
+                    <div className="flex items-baseline gap-1">
+                        <motion.span
+                            initial={{ opacity: 0, scale: 0.75 }}
+                            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                            transition={{
+                                type: "spring",
+                                stiffness: 180,
+                                damping: 13,
+                                delay: 0.5 + idx * 0.15,
+                            }}
+                            className="text-3xl font-bold"
+                        >
+                            ${plan.price}
+                        </motion.span>
+                        {subtext && <span className="text-xs opacity-80">{subtext}</span>}
                     </div>
                 </div>
 
-                <p className="text-slate-500 text-sm leading-relaxed mb-8">
-                    {plan.description}
-                </p>
+                {/* Content Section */}
+                <div className="p-6">
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={isInView ? { opacity: 1 } : {}}
+                        transition={{ duration: 0.5, delay: 0.45 + idx * 0.1 }}
+                        className="text-slate-500 text-[13px] mb-6 leading-snug h-10"
+                    >
+                        {plan.description}
+                    </motion.p>
 
-                <div className="space-y-4 mb-10">
-                    {plan.features.map((feature: string, i: number) => (
-                        <div key={i} className="flex items-start gap-3">
-                            <div className="w-5 h-5 rounded-full bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
-                                <Check className="w-3 h-3 text-[#77AEE1]" strokeWidth={3} />
-                            </div>
-                            <span className="text-sm text-slate-600 font-medium">{feature}</span>
-                        </div>
-                    ))}
+                    {/* Features List */}
+                    <div className="space-y-3">
+                        {plan.features.map((feature: string, fIndex: number) => (
+                            <motion.div
+                                key={fIndex}
+                                custom={fIndex}
+                                variants={featureVariants}
+                                initial="hidden"
+                                animate={isInView ? "visible" : "hidden"}
+                                className="flex items-center gap-3"
+                            >
+                                <motion.div
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={isInView ? { scale: 1, opacity: 1 } : {}}
+                                    transition={{
+                                        type: "spring",
+                                        stiffness: 300,
+                                        damping: 14,
+                                        delay: 0.4 + fIndex * 0.07,
+                                    }}
+                                    className="w-4.5 h-4.5 rounded-full border border-[#77AEE1] flex items-center justify-center shrink-0"
+                                >
+                                    <Check className="text-[#77AEE1] w-2.5 h-2.5" strokeWidth={4} />
+                                </motion.div>
+                                <span className="text-[13px] text-slate-700 font-medium">{feature}</span>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            <button
-                disabled={isLoading || isCurrent}
-                onClick={() => onSubscribe(plan.id)}
-                className={cn(
-                    "w-full py-3 rounded-md font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98]",
-                    isCurrent 
-                        ? "bg-slate-100 text-slate-400 cursor-default" 
-                        : "bg-[#77AEE1] hover:bg-[#669dcf] text-white shadow-blue-100"
-                )}
-            >
-                {isLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                ) : isCurrent ? (
-                    <ShieldCheck className="w-5 h-5" />
+            {/* Action Button */}
+            <div className="p-6 pt-0">
+                {isCurrent ? (
+                    <div className="w-full py-3.5 bg-slate-100 text-slate-400 font-bold rounded-xl text-sm flex items-center justify-center gap-2 cursor-default border border-slate-200">
+                        <ShieldCheck className="w-4.5 h-4.5 text-slate-400" />
+                        Active Plan
+                    </div>
                 ) : (
-                    <PlaneIcon className="w-5 h-5" />
+                    <motion.button
+                        whileHover={{ backgroundColor: "#5a9fd4", scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={isInView ? { opacity: 1, y: 0 } : {}}
+                        onClick={() => onSubscribe(plan.id)}
+                        disabled={isLoading}
+                        className="w-full py-3.5 bg-[#77AEE1] text-white font-bold rounded-xl shadow-md text-sm flex items-center justify-center gap-2"
+                    >
+                        {isLoading ? (
+                            <>
+                                <Loader className="w-4 h-4 animate-spin" />
+                                Redirecting...
+                            </>
+                        ) : (
+                            <>
+                                <PlaneIcon className="w-4 h-4" />
+                                Upgrade to Pro
+                            </>
+                        )}
+                    </motion.button>
                 )}
-                {isCurrent ? "Active Plan" : "Upgrade to Pro"}
-            </button>
+            </div>
         </motion.div>
     );
 }
