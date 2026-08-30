@@ -20,6 +20,12 @@ const profileSchema = z.object({
   newPassword: z.string().min(8, "Min 8 characters").optional().or(z.literal("")),
   confirmPassword: z.string().optional().or(z.literal("")),
 }).refine((data) => {
+  if (data.newPassword && !data.currentPassword) return false;
+  return true;
+}, {
+  message: "Current password is required to change password",
+  path: ["currentPassword"],
+}).refine((data) => {
   if (data.newPassword && data.newPassword !== data.confirmPassword) return false;
   return true;
 }, {
@@ -87,7 +93,8 @@ export default function UserProfilePage() {
       };
 
       if (values.newPassword) {
-        dataPayload.password = values.newPassword;
+        dataPayload.oldPassword = values.currentPassword;
+        dataPayload.newPassword = values.newPassword;
       }
 
       formData.append("data", JSON.stringify(dataPayload));
@@ -96,6 +103,12 @@ export default function UserProfilePage() {
       if (res.success) {
         toast.success(res.message || "Profile updated successfully!");
         setSelectedFile(null);
+        reset({
+          ...values,
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
       }
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to update profile");
