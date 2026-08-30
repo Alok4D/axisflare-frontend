@@ -1,10 +1,9 @@
-"use client";
-
+import { useRef, useState } from 'react';
 import { Check, Pencil, Loader, Edit } from 'lucide-react';
 import { useGetSubscriptionPlansQuery, useDeleteSubscriptionPlanMutation } from '@/lib/features/subscription/subscriptionApi';
 import { toast } from 'sonner';
 import EditPlanModal from './components/EditPlanModal';
-import { useState } from 'react';
+import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 interface PricingPlan {
     id: string;
@@ -16,53 +15,122 @@ interface PricingPlan {
     isPopular?: boolean;
 }
 
-const PricingCard: React.FC<{ plan: PricingPlan; onEdit: (plan: PricingPlan) => void; onDelete: (id: string) => void; isDeleting: boolean }> = ({ plan, onEdit, onDelete }) => {
+const PricingCard: React.FC<{ plan: PricingPlan; onEdit: (plan: PricingPlan) => void; onDelete: (id: string) => void; isDeleting: boolean }> = ({ plan, onEdit }) => {
+    const cardRef = useRef<HTMLDivElement>(null);
+    const isInView = useInView(cardRef, { once: true });
+
+    const rawY = useMotionValue(0);
+    const rawShadow = useMotionValue(0);
+
+    const y = useSpring(rawY, { stiffness: 120, damping: 18, mass: 0.6 });
+    const shadowBlur = useSpring(rawShadow, { stiffness: 120, damping: 18, mass: 0.6 });
+    const boxShadow = useTransform(
+        shadowBlur,
+        [0, 1],
+        [
+            "0 4px 12px -2px rgba(119,174,225,0.08)",
+            "0 24px 40px -8px rgba(119,174,225,0.22)",
+        ]
+    );
+
+    const cardVariants = {
+        hidden: { opacity: 0, y: 40, scale: 0.96 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+        },
+    };
+
+    const featureVariants = {
+        hidden: { opacity: 0, x: -16 },
+        visible: (i: number) => ({
+            opacity: 1,
+            x: 0,
+            transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const, delay: i * 0.07 },
+        }),
+    };
+
     return (
-        <div className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-slate-100">
-            {/* Blue Header Section */}
-            <div className="bg-[#77AEE1] p-6 text-white h-32 flex flex-col justify-center relative">
-                {/* Popular Badge */}
-                <h3 className="text-[17px] font-medium mb-1">{plan.name}</h3>
-                <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold">
-                        ${plan.price}
-                    </span>
-                    <span className="text-xs opacity-80">{plan.period}</span>
+        <motion.div
+            ref={cardRef}
+            variants={cardVariants}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            style={{ y, boxShadow }}
+            onMouseEnter={() => { rawY.set(-7); rawShadow.set(1); }}
+            onMouseLeave={() => { rawY.set(0); rawShadow.set(0); }}
+            className="flex flex-col justify-between w-84.75 h-130 bg-white border border-blue-50 rounded-2xl overflow-hidden cursor-pointer"
+        >
+            <div className="flex flex-col">
+                {/* Blue Header Section */}
+                <div className="bg-[#77AEE1] p-6 text-white h-30 flex flex-col justify-center">
+                    <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-[17px] font-medium">{plan.name}</h3>
+                        {plan.period === "/year" && (
+                            <span className="bg-amber-400 text-white px-2 py-0.5 rounded-full text-[9px] font-black uppercase">Popular</span>
+                        )}
+                    </div>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-bold">
+                            ${plan.price}
+                        </span>
+                        {plan.period && <span className="text-xs opacity-80">{plan.period}</span>}
+                    </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="p-6">
+                    <p className="text-slate-500 text-[13px] mb-6 leading-snug h-10">
+                        {plan.description}
+                    </p>
+
+                    {/* Features List */}
+                    <div className="space-y-3">
+                        {plan.features.map((feature, fIndex) => (
+                            <motion.div
+                                key={fIndex}
+                                custom={fIndex}
+                                variants={featureVariants}
+                                initial="hidden"
+                                animate={isInView ? "visible" : "hidden"}
+                                className="flex items-center gap-3"
+                            >
+                                <motion.div
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={isInView ? { scale: 1, opacity: 1 } : {}}
+                                    transition={{
+                                        type: "spring",
+                                        stiffness: 300,
+                                        damping: 14,
+                                        delay: 0.4 + fIndex * 0.07,
+                                    }}
+                                    className="w-4.5 h-4.5 rounded-full border border-[#77AEE1] flex items-center justify-center shrink-0"
+                                >
+                                    <Check className="text-[#77AEE1] w-2.5 h-2.5" strokeWidth={4} />
+                                </motion.div>
+                                <span className="text-[13px] text-slate-700 font-medium">{feature.text}</span>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            {/* Content Section */}
-            <div className="p-6 flex-1">
-                <p className="text-slate-500 text-[13px] mb-6 leading-relaxed h-10">
-                    {plan.description}
-                </p>
-
-                {/* Features List */}
-                <div className="space-y-4">
-                    {plan.features.map((feature, fIndex) => (
-                        <div key={fIndex} className="flex items-center gap-3">
-                            <div className="w-5 h-5 rounded-full border border-[#77AEE1]/30 flex items-center justify-center shrink-0 bg-[#77AEE1]/5">
-                                <Check className="text-[#77AEE1] w-3 h-3" strokeWidth={4} />
-                            </div>
-                            <span className="text-[13px] text-slate-700 font-medium">{feature.text}</span>
-                        </div>
-                    ))}
-                </div>
+            {/* Action Button */}
+            <div className="p-6 pt-0">
+                <motion.button
+                    whileHover={{ backgroundColor: "#5a9fd4", scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    onClick={() => onEdit(plan)}
+                    className="w-full py-3.5 bg-[#77AEE1] text-white font-bold rounded-xl shadow-md text-sm flex items-center justify-center gap-2"
+                >
+                    Edit Plan Information
+                    <Edit className="w-4 h-4" />
+                </motion.button>
             </div>
-
-            {/* Action Buttons */}
-            <div className="p-6 pt-0 mt-auto">
-                <div className='flex gap-2.5'>
-                    <button
-                        onClick={() => onEdit(plan)}
-                        className="w-full py-3 px-4 bg-[#77AEE1] hover:bg-[#5a9fd4] text-black font-medium rounded-md text-[13px] flex items-center justify-center gap-2 text-[16px] transition-colors"
-                    >
-                        Edit Plan Information
-                        <Edit className="w-3.5 h-3.5" />
-                    </button>
-                </div>
-            </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -111,19 +179,15 @@ const PricingSection: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50/50 py-12 px-4 font-sans">
-            <div className="max-w-7xl mx-auto">
+        <div className="p-12 bg-[#F9FAFB] min-h-screen space-y-10 font-sans">
+            <div className="max-w-7xl mx-auto space-y-10">
                 {/* Page Header */}
-                <div className="text-center mb-16 max-w-3xl mx-auto space-y-4">
-                    <h1 className="text-4xl md:text-6xl font-black text-[#1E293B] tracking-tight leading-tight">
-                        Powerful Plans for <br className="hidden md:block" />
-                        <span className="bg-linear-to-r from-[#FF7A00] to-[#FFA500] bg-clip-text text-transparent">
-                            Users
-                        </span>
+                <div className="space-y-2">
+                    <h1 className="text-3xl font-bold text-[#1C1F37]">
+                        Subscription Management
                     </h1>
-                    <p className="text-[#64748B] text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
-                        Choose the perfect roadmap for your journey. Start <span className="text-[#1E293B] font-bold">Free</span> or unlock 
-                        <span className="text-[#77AEE1] font-bold"> Advanced Admin Controls</span> and premium capabilities.
+                    <p className="text-[#999999] text-sm font-normal">
+                        Configure and manage pricing tiers, billing periods, and available features for your users.
                     </p>
                 </div>
 
@@ -137,7 +201,7 @@ const PricingSection: React.FC = () => {
                         <p className="text-gray-500">No subscription plans found. Create one to get started.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+                    <div className="flex flex-wrap gap-8 justify-start min-h-[400px]">
                         {pricingPlans.map((plan) => (
                             <PricingCard
                                 key={plan.id}
